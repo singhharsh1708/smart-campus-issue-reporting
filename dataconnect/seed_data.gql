@@ -1,0 +1,76 @@
+mutation CreateDemoData @transaction @auth(level: PUBLIC, insecureReason: "This mutation is used to seed the database with demo data and is safe to expose to the public.") {
+  location_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      name: "Main Campus",
+      type: "Campus",
+      description: "The primary academic buildings and central administrative offices.",
+      coordinates: "37.7749,-122.4194"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Science Building",
+      type: "Building",
+      description: "Home to biology, chemistry, and physics labs.",
+      coordinates: "37.7792,-122.4203"
+    }
+  ])
+  user_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440002",
+      authId: "user123",
+      displayName: "Jane Doe",
+      role: "Student",
+      createdAt: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440003",
+      authId: "admin456",
+      displayName: "Admin User",
+      role: "Administrator",
+      createdAt: "2023-12-15T00:00:00Z"
+    }
+  ])
+  campusIssue_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440004",
+      locationId: "550e8400-e29b-41d4-a716-446655440000",
+      reporterId: "550e8400-e29b-41d4-a716-446655440002",
+      title: "Broken Sidewalk",
+      description: "Cracked sidewalk near the entrance.",
+      status: "Reported",
+      createdAt: "2024-02-01T00:00:00Z",
+      priority: "Medium",
+      isPublic: true
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440005",
+      locationId: "550e8400-e29b-41d4-a716-446655440001",
+      reporterId: "550e8400-e29b-41d4-a716-446655440002",
+      title: "Leaky Faucet",
+      description: "Dripping faucet in the lab.",
+      status: "In Progress",
+      createdAt: "2024-02-15T00:00:00Z",
+      priority: "High",
+      isPublic: false
+    }
+  ])
+  comment_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440006",
+      authorId: "550e8400-e29b-41d4-a716-446655440003",
+      issueId: "550e8400-e29b-41d4-a716-446655440004",
+      content: "Acknowledged the report.",
+      createdAt: "2024-02-02T00:00:00Z",
+      isInternal: true
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440007",
+      authorId: "550e8400-e29b-41d4-a716-446655440002",
+      issueId: "550e8400-e29b-41d4-a716-446655440005",
+      content: "Please fix this soon!",
+      createdAt: "2024-02-16T00:00:00Z",
+      isInternal: false
+    }
+  ])
+}

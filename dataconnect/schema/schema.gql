@@ -1,0 +1,37 @@
+type User @table {
+  authId: String!
+  displayName: String!
+  role: String!
+  createdAt: Timestamp!
+  email: String
+  photoUrl: String
+}
+
+type Location @table {
+  name: String!
+  type: String!
+  description: String
+  coordinates: String
+}
+
+type CampusIssue @table {
+  title: String!
+  description: String!
+  location: Location!
+  status: String!
+  createdAt: Timestamp!
+  reporter: User!
+  photoUrl: String
+  category: String
+  priority: String
+  isPublic: Boolean
+  assignedTo: User
+}
+
+type Comment @table {
+  content: String!
+  createdAt: Timestamp!
+  author: User!
+  issue: CampusIssue!
+  isInternal: Boolean
+}

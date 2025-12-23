@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Campus Issue Reporting System</title>
+  <meta name="description" content="Report and track campus infrastructure issues with our smart reporting system">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-building"></i>
+          <h1>Smart Campus</h1>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="theme-toggle" id="themeToggle" title="Toggle theme">
+            <i class="fas fa-moon"></i>
+          </button>
+          <div class="user-info" id="userInfo" style="display: none;">
+            <span class="user-email" id="userEmail"></span>
+            <span class="user-role" id="userRole"></span>
+            <button class="btn btn-outline" id="logoutBtn" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="container">
+      
+      <!-- Authentication Section -->
+      <section class="auth-section" id="authSection">
+        <div class="auth-card">
+          <div class="auth-header">
+            <h2>
+              <i class="fas fa-lock"></i>
+              Login / Register
+            </h2>
+            <p>Access the campus issue reporting system</p>
+          </div>
+          
+          <form class="auth-form" onsubmit="event.preventDefault();">
+            <div class="form-group">
+              <label for="email">
+                <i class="fas fa-envelope"></i>
+                Email Address
+              </label>
+              <input 
+                type="email" 
+                id="email" 
+                placeholder="Enter your email" 
+                required
+                autocomplete="email"
+              >
+            </div>
+            
+            <div class="form-group">
+              <label for="password">
+                <i class="fas fa-lock"></i>
+                Password
+              </label>
+              <input 
+                type="password" 
+                id="password" 
+                placeholder="Enter your password" 
+                required
+                autocomplete="current-password"
+              >
+            </div>
+            
+            <div class="form-group">
+              <label for="role">
+                <i class="fas fa-user-tag"></i>
+                Role
+              </label>
+              <select id="role" required>
+                <option value="">Select your role</option>
+                <option value="student">👨‍🎓 Student</option>
+                <option value="admin">🧑‍💼 Administrator</option>
+              </select>
+            </div>
+            
+      <div class="auth-actions">
+        <button type="button" class="btn btn-primary" onclick="register()" id="registerBtn">
+          <i class="fas fa-user-plus"></i>
+          Register
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="login()" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i>
+          Login
+        </button>
+      </div>
+      
+      <div id="systemStatus" class="system-status">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>System initializing...</span>
+      </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Issue Reporting Section -->
+      <section class="reporting-section" id="reportingSection" style="display: none;">
+        <div class="section-header">
+          <h2>
+            <i class="fas fa-exclamation-triangle"></i>
+            Report New Issue
+          </h2>
+          <p>Help improve our campus by reporting infrastructure problems</p>
+        </div>
+        
+        <div class="form-card">
+          <form id="issueForm" class="issue-form">
+            <div class="form-group">
+              <label for="title">
+                <i class="fas fa-heading"></i>
+                Issue Title
+              </label>
+              <input 
+                type="text" 
+                id="title" 
+                placeholder="Brief description of the issue" 
+                required
+                maxlength="100"
+              >
+              <small class="form-help">3-100 characters</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="description">
+                <i class="fas fa-align-left"></i>
+                Detailed Description
+              </label>
+              <textarea 
+                id="description" 
+                placeholder="Provide detailed information about the issue including location, severity, and impact" 
+                required
+                maxlength="1000"
+                rows="4"
+              ></textarea>
+              <small class="form-help">10-1000 characters</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="imageUrl">
+                <i class="fas fa-image"></i>
+                Image URL (Optional)
+              </label>
+              <input 
+                type="url" 
+                id="imageUrl" 
+                placeholder="Paste image URL if available"
+              >
+              <small class="form-help">Direct link to an image showing the issue</small>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-paper-plane"></i>
+                Submit Issue Report
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Issues Management Section (Admin Only) -->
+      <section class="issues-section" id="issuesSection" style="display: none;">
+        <div class="section-header">
+          <div class="header-left">
+            <h2>
+              <i class="fas fa-list-alt"></i>
+              Reported Issues
+            </h2>
+            <p>Manage and track all campus issues</p>
+          </div>
+          <div class="header-right">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search issues..." 
+                oninput="searchIssues(this.value)"
+              >
+            </div>
+            <div class="filter-options">
+              <select id="statusFilter" onchange="filterIssues(this.value)">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="issues-stats" id="issuesStats">
+          <div class="stat-card">
+            <div class="stat-icon pending">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="pendingCount">0</span>
+              <span class="stat-label">Pending</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon progress">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="progressCount">0</span>
+              <span class="stat-label">In Progress</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon resolved">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="resolvedCount">0</span>
+              <span class="stat-label">Resolved</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon total">
+              <i class="fas fa-list"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-number" id="totalCount">0</span>
+              <span class="stat-label">Total</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="issues-container">
+          <div id="issuesList" class="issues-list">
+            <div class="loading-placeholder">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>Loading issues...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>Smart Campus</h4>
+          <p>Efficient campus infrastructure management through technology</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#" onclick="scrollToSection('reportingSection')">Report Issue</a></li>
+            <li><a href="#" onclick="scrollToSection('issuesSection')">View Issues</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="mailto:support@smartcampus.edu">Contact Support</a></li>
+            <li><a href="#" onclick="showHelp()">Help Center</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; © 2025 Smart Campus Issue Reporting System | Built by Harsh Singh
+</p>
+      </div>
+    </div>
+  </footer>
+  <!-- Firebase SDKs (ORDER MATTERS) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- App Script (LAST) -->
+<script src="app.js"></script>
+
+
+  <!-- Utility Functions -->
+  <script>
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function showHelp() {
+      alert(`Help & Support:
+
+📧 Email: support@smartcampus.edu
+📱 Phone: (555) 123-4567
+
+For issues:
+1. Students: Report problems through the form above
+2. Admins: Monitor and manage reported issues
+
+Emergency: For urgent campus safety issues, contact campus security immediately.`);
+    }
+
+    // Show/hide sections based on authentication
+    function updateUIBasedOnAuth() {
+      const authSection = document.getElementById('authSection');
+      const reportingSection = document.getElementById('reportingSection');
+      const issuesSection = document.getElementById('issuesSection');
+      const userInfo = document.getElementById('userInfo');
+      const userEmail = document.getElementById('userEmail');
+      const userRole = document.getElementById('userRole');
+
+      if (window.currentUser && window.currentUserRole) {
+        // User is logged in
+        authSection.style.display = 'none';
+        reportingSection.style.display = 'block';
+        userInfo.style.display = 'flex';
+        userEmail.textContent = window.currentUser.email;
+        userRole.textContent = window.currentUserRole.charAt(0).toUpperCase() + window.currentUserRole.slice(1);
+
+        // Show issues section only for admins
+        if (window.currentUserRole === 'admin') {
+          issuesSection.style.display = 'block';
+        } else {
+          issuesSection.style.display = 'none';
+        }
+      } else {
+        // User is not logged in
+        authSection.style.display = 'block';
+        reportingSection.style.display = 'none';
+        issuesSection.style.display = 'none';
+        userInfo.style.display = 'none';
+      }
+    }
+
+    // Filter issues function
+    function filterIssues(status) {
+      const issueCards = document.querySelectorAll('.issue-card');
+      issueCards.forEach(card => {
+        const cardStatus = card.getAttribute('data-status');
+        if (!status || cardStatus === status) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Update global variables when user state changes
+    document.addEventListener('DOMContentLoaded', function() {
+      // Make currentUser and currentUserRole globally accessible
+      Object.defineProperty(window, 'currentUser', {
+        get: function() { return window._currentUser || null; },
+        set: function(value) { window._currentUser = value; updateUIBasedOnAuth(); }
+      });
+      
+      Object.defineProperty(window, 'currentUserRole', {
+        get: function() { return window._currentUserRole || null; },
+        set: function(value) { window._currentUserRole = value; updateUIBasedOnAuth(); }
+      });
+    });
+  </script>
+</body>
+</html>
